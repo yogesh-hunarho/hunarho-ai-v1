@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum CreditTransactionType {
+  GRANT // Plan purchase
+  CONSUME // User action
+  REFUND
+  ADJUST
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum MessageSender {
+  USER
+  AI
+  SYSTEM
+}
+
+model User {
+  id     String  @id @default(uuid())
+  userId String  @unique
+  name   String?
+  email  String  @unique
+
+  payType String @default("Free")
+
+  payments Payment[]
+
+  communications        Communication[]
+  communicationMessages CommunicationMessage[]
+
+  debates        Debate[]
+  debateMessages DebateMessage[]
+
+  interviews        Interview[]
+  interviewMessages InterviewMessage[]
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  userCredits        UserCredit[]
+  creditTransactions CreditTransaction[]
+}
+
+model Communication {
+  id       String @id @default(uuid())
+  userId   String
+  uniqueId String @unique
+  topic    String
+
+  prepType        String
+  difficultyLevel String
+  focusArea       String
+  duration        Int
+
+  score      Float  @default(0)
+  evaluationMessage Json @default("{}")
+  evaluation String @default("Not evaluated")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User                   @relation(fields: [userId], references: [userId])
+  messages CommunicationMessage[]
+
+  @@index([userId])
+}
+
+model CommunicationMessage {
+  id              String        @id @default(uuid())
+  communicationId String
+  userId          String
+  sender          MessageSender
+  content         String
+  timestamp       DateTime      @default(now())
+
+  communication Communication @relation(fields: [communicationId], references: [id])
+  user          User          @relation(fields: [userId], references: [userId])
+
+  @@index([communicationId])
+  @@index([userId])
+}
+
+model Debate {
+  id           String @id @default(uuid())
+  userId       String
+  uniqueId     String @unique
+  debatename   String
+  topic        String
+  level        String
+  argumentType String
+  duration     Int
+
+  score      Float  @default(0)
+  evaluationMessage Json @default("{}")
+  evaluation String @default("Not evaluated")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User            @relation(fields: [userId], references: [userId])
+  messages DebateMessage[]
+
+  @@index([userId])
+}
+
+model DebateMessage {
+  id        String        @id @default(uuid())
+  debateId  String
+  userId    String
+  sender    MessageSender
+  content   String
+  timestamp DateTime      @default(now())
+
+  debate Debate @relation(fields: [debateId], references: [id])
+  user   User   @relation(fields: [userId], references: [userId])
+
+  @@index([debateId])
+  @@index([userId])
+}
+
+model Interview {
+  id       String @id @default(uuid())
+  userId   String
+  uniqueId String @unique
+
+  jobType        String
+  jobRole        String?
+  jobDescription String?
+  techStack      String?
+  yearsOfExperience Int @default(0)
+  interviewType  String
+  duration       Int
+
+  score      Float  @default(0)
+  evaluation String @default("Not evaluated")
+  evaluationMessage Json @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User               @relation(fields: [userId], references: [userId])
+  messages InterviewMessage[]
+
+  @@index([userId])
+}
+
+model InterviewMessage {
+  id          String        @id @default(uuid())
+  interviewId String
+  userId      String
+  sender      MessageSender
+  content     String
+  timestamp   DateTime      @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id])
+  user      User      @relation(fields: [userId], references: [userId])
+
+  @@index([interviewId])
+  @@index([userId])
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  userId    String
+  provider  String // razorpay / stripe
+  paymentId String
+  orderId   String
+  status    PaymentStatus
+  planType  String
+  amount    Float
+  currency  String
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+}
+
+model AIUsage {
+  id         String   @id @default(uuid())
+  userId     String
+  sessionId  String?
+  model      String // gemini-1.5-pro
+  tokensUsed Int
+  cost       Float
+  createdAt  DateTime @default(now())
+}
+
+model Plan {
+  id       String  @id @default(uuid())
+  name     String  @unique // Free, Basic, Pro
+  price    Int // 0, 99, 499 (store in smallest unit if needed)
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  credits PlanCredit[]
+}
+
+model PlanCredit {
+  planId String
+  type   String
+  amount Int
+
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@id([planId, type])
+}
+
+model UserCredit {
+  id        String     @id @default(uuid())
+  userId    String
+  type      String
+  balance   Int
+  updatedAt DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@unique([userId, type])
+}
+
+model CreditTransaction {
+  id        String                @id @default(uuid())
+  userId    String
+  type      String
+  amount    Int
+  action    CreditTransactionType
+  reference String?
+  createdAt DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
+}
