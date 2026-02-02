@@ -204,7 +204,7 @@ model AIUsage {
 
 model Plan {
   id       String  @id @default(uuid())
-  name     String  @unique // Free, Basic, Pro
+  name     String  @unique // Basic, Advanced
   price    Int // 0, 99, 499 (store in smallest unit if needed)
   isActive Boolean @default(true)
 
