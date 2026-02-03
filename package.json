@@ -14,10 +14,12 @@
     "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.3.0",
     "dotenv": "^17.2.3",
+    "katex": "^0.16.28",
     "lru-cache": "^11.2.4",
     "next": "16.1.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-katex": "^3.1.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
@@ -25,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-katex": "^3.0.4",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "prisma": "^7.3.0",

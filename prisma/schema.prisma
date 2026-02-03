@@ -55,6 +55,50 @@ model User {
   updatedAt          DateTime            @updatedAt
   userCredits        UserCredit[]
   creditTransactions CreditTransaction[]
+
+  aptitudeTests AptitudeTest[]
+}
+
+model AptitudeTest {
+  id          String @id @default(uuid())
+  userId      String
+  uniqueId    String @unique
+  category    String
+  subCategory String
+  difficulty  String // Initial difficulty preference
+  questionCount Int
+  
+  score       Float @default(0)
+  status      String @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User               @relation(fields: [userId], references: [userId])
+  questions AptitudeQuestion[]
+
+  @@index([userId])
+}
+
+model AptitudeQuestion {
+  id             String @id @default(uuid())
+  aptitudeTestId String
+  
+  questionText   String @db.Text
+  options        Json   // Array of strings
+  correctAnswer  String
+  explanation    String? @db.Text
+  difficulty     String // EASY, MEDIUM, HARD
+  hint           String? @db.Text
+  
+  userAnswer     String?
+  isCorrect      Boolean @default(false)
+  
+  createdAt      DateTime @default(now())
+
+  aptitudeTest AptitudeTest @relation(fields: [aptitudeTestId], references: [id])
+
+  @@index([aptitudeTestId])
 }
 
 model Communication {

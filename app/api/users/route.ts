@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json( { error: "Failed to insert users" }, { status: 500 } );
+    return NextResponse.json({ error: "Failed to insert users" }, { status: 500 });
   }
 }
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
 //     if (!Array.isArray(users) || users.length === 0) {
 //       return NextResponse.json(
-//         { 
+//         {
 //           error: "Users array is required",
 //           exampleData:[
 //             {
