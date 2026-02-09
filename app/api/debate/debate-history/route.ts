@@ -17,7 +17,10 @@ export async function POST(req:NextRequest){
                 argumentType:true,
                 duration: true,
                 score: true,
-                createdAt:true
+                createdAt:true,
+                id:true,
+                evaluation:true,
+                evaluationMessage:true
             }
         });
     
@@ -26,7 +29,7 @@ export async function POST(req:NextRequest){
         }
 
         const debatemessage = await prisma.debateMessage.findMany({
-            where: { debateId: uniqueId, },
+            where: { debateId: debate.id, },
             select:{
                 sender:true,
                 content:true,

@@ -6,13 +6,14 @@ const RequestBodySchema = z.object({
     userId: z.string(),
 });
 
-export async function GET(req:NextRequest){
-    let body;
-    try {
-        body = RequestBodySchema.parse(await req.json());
-    } catch {
-        return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-    }
+export async function POST(req:NextRequest){
+    const body = await req.json();
+    // try {
+    //     body = RequestBodySchema.parse(await req.json());
+    //     console.log("dassad",body)
+    // } catch {
+    //     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    // }
     try {
         const debate = await prisma.debate.findMany({
             where: { userId:body.userId },

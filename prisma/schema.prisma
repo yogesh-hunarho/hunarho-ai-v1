@@ -32,6 +32,14 @@ enum MessageSender {
   SYSTEM
 }
 
+enum AIUsageType {
+  debate
+  interview
+  communication
+  evaluation
+}
+
+
 model User {
   id     String  @id @default(uuid())
   userId String  @unique
@@ -55,6 +63,18 @@ model User {
   updatedAt          DateTime            @updatedAt
   userCredits        UserCredit[]
   creditTransactions CreditTransaction[]
+}
+
+model UserImportAudit {
+  id        String   @id @default(uuid())
+  email     String
+  userId    String?
+  reason    String
+  payload   Json
+  source    String   // ADMIN_UPLOAD, CSV, API
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model Communication {
@@ -86,7 +106,7 @@ model CommunicationMessage {
   communicationId String
   userId          String
   sender          MessageSender
-  content         String
+  content         String        @db.Text
   timestamp       DateTime      @default(now())
 
   communication Communication @relation(fields: [communicationId], references: [id])
@@ -124,7 +144,7 @@ model DebateMessage {
   debateId  String
   userId    String
   sender    MessageSender
-  content   String
+  content   String        @db.Text
   timestamp DateTime      @default(now())
 
   debate Debate @relation(fields: [debateId], references: [id])
@@ -165,7 +185,7 @@ model InterviewMessage {
   interviewId String
   userId      String
   sender      MessageSender
-  content     String
+  content     String        @db.Text
   timestamp   DateTime      @default(now())
 
   interview Interview @relation(fields: [interviewId], references: [id])
@@ -199,6 +219,7 @@ model AIUsage {
   model      String // gemini-1.5-pro
   tokensUsed Int
   cost       Float
+  type       AIUsageType?
   createdAt  DateTime @default(now())
 }
 

@@ -16,6 +16,7 @@ export interface Debate {
     topic: string;
     level: string;
     userId: string;
+    id: string
 }
 
 export interface Communication {
@@ -34,7 +35,7 @@ export async function fetchDebate(debateId: string): Promise<Debate | null> {
 
     const debate = await prisma.debate.findUnique({
         where: { uniqueId: debateId },
-        select: { argumentType: true, topic: true, level: true, userId: true },
+        select: { argumentType: true, topic: true, level: true, userId: true, id:true },
     });
 
     if (debate) {
@@ -43,6 +44,7 @@ export async function fetchDebate(debateId: string): Promise<Debate | null> {
             topic: debate.topic,
             level: debate.level,
             userId: debate.userId,
+            id: debate.id
         };
         cache.set(debateId, mappedDebate);
         return mappedDebate;
