@@ -14,6 +14,20 @@ CREATE TABLE `User` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `UserImportAudit` (
+    `id` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NULL,
+    `reason` VARCHAR(191) NOT NULL,
+    `payload` JSON NOT NULL,
+    `source` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `UserImportAudit_email_idx`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Communication` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -40,7 +54,7 @@ CREATE TABLE `CommunicationMessage` (
     `communicationId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `sender` ENUM('USER', 'AI', 'SYSTEM') NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
     `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `CommunicationMessage_communicationId_idx`(`communicationId`),
@@ -75,7 +89,7 @@ CREATE TABLE `DebateMessage` (
     `debateId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `sender` ENUM('USER', 'AI', 'SYSTEM') NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
     `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `DebateMessage_debateId_idx`(`debateId`),
@@ -112,7 +126,7 @@ CREATE TABLE `InterviewMessage` (
     `interviewId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `sender` ENUM('USER', 'AI', 'SYSTEM') NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
     `timestamp` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `InterviewMessage_interviewId_idx`(`interviewId`),
@@ -145,6 +159,7 @@ CREATE TABLE `AIUsage` (
     `model` VARCHAR(191) NOT NULL,
     `tokensUsed` INTEGER NOT NULL,
     `cost` DOUBLE NOT NULL,
+    `type` ENUM('debate', 'interview', 'communication', 'evaluation') NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -165,7 +180,7 @@ CREATE TABLE `Plan` (
 -- CreateTable
 CREATE TABLE `PlanCredit` (
     `planId` VARCHAR(191) NOT NULL,
-    `type` ENUM('AT', 'CS', 'IV') NOT NULL,
+    `type` VARCHAR(191) NOT NULL,
     `amount` INTEGER NOT NULL,
 
     PRIMARY KEY (`planId`, `type`)
@@ -175,7 +190,7 @@ CREATE TABLE `PlanCredit` (
 CREATE TABLE `UserCredit` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `type` ENUM('AT', 'CS', 'IV') NOT NULL,
+    `type` VARCHAR(191) NOT NULL,
     `balance` INTEGER NOT NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -187,7 +202,7 @@ CREATE TABLE `UserCredit` (
 CREATE TABLE `CreditTransaction` (
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
-    `type` ENUM('AT', 'CS', 'IV') NOT NULL,
+    `type` VARCHAR(191) NOT NULL,
     `amount` INTEGER NOT NULL,
     `action` ENUM('GRANT', 'CONSUME', 'REFUND', 'ADJUST') NOT NULL,
     `reference` VARCHAR(191) NULL,
