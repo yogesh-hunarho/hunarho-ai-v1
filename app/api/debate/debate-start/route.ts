@@ -75,7 +75,8 @@ export async function POST(req:NextRequest){
                     level:level,
                     argumentType:argueType,
                     duration:Number(duration),
-                    score:0.0
+                    score:0.0,
+                    evaluationMessage:{}
                 },
             });
 

@@ -78,7 +78,8 @@ export async function POST(req:NextRequest){
                     yearsOfExperience,
                     interviewType,
                     duration:Number(duration),
-                    score:0.0
+                    score:0.0,
+                    evaluationMessage:{}
                 },
             });
 

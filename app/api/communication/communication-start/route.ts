@@ -77,6 +77,7 @@ export async function POST(req:NextRequest){
                     focusArea,
                     duration: Number(duration),
                     score: 0,
+                    evaluationMessage:{}
                 },
             });
 
