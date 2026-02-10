@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { cors } from "@/lib/cors";
+
+export async function OPTIONS() {
+  return cors(
+    NextResponse.json({}, { status: 200 })
+  );
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, userId } = await req.json();
+    const signature = req.headers.get("x-api-signature");
+    if (signature !== process.env.API_SHARED_SECRET) {
+      return cors(
+        NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      );
+    }
 
-    if (!email || !userId) {
+    // const { name, email, userId } = await req.json();
+    const body = await req.json();
+
+    if (!body.email || !body.userId) {
       return NextResponse.json( { error: "userId and email are required" }, { status: 400 } );
     }
 
-    const existing = await prisma.user.findUnique({ where: { userId } });
+    const existing = await prisma.user.findUnique({ where: { userId: body.userId } });
 
     if (existing) {
       return NextResponse.json( { error: "User already exists" }, { status: 409 } );
@@ -27,9 +42,9 @@ export async function POST(req: NextRequest) {
     const user = await prisma.$transaction(async (tx) => {
       const createdUser = await tx.user.create({
         data: {
-          name,
-          email,
-          userId,
+          name:body.name,
+          email:body.email,
+          userId:body.userId,
           payType: "Basic",
         },
       });
