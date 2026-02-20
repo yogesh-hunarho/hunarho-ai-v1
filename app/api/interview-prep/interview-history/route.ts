@@ -7,7 +7,7 @@ interface RequestBody{
 export async function POST(req:NextRequest){
     const { uniqueId }:RequestBody = await req.json();
     try {
-        const debate = await prisma.interview.findUnique({
+        const interview = await prisma.interview.findUnique({
             where: { uniqueId:uniqueId },
             select:{
                 uniqueId: true,
@@ -17,16 +17,18 @@ export async function POST(req:NextRequest){
                 duration: true,
                 score: true,
                 evaluation:true,
-                createdAt:true
+                createdAt:true,
+                id:true,
+                evaluationMessage:true,
             }
         });
     
-        if (!debate) {
+        if (!interview) {
             return NextResponse.json({ error: 'interview not found' },{ status:404 });
         }
 
-        const debatemessage = await prisma.interviewMessage.findMany({
-            where: { id: uniqueId },
+        const interviewmessage = await prisma.interviewMessage.findMany({
+            where: { interviewId: interview.id },
             select:{
                 sender:true,
                 content:true,
@@ -34,7 +36,7 @@ export async function POST(req:NextRequest){
             }
         });
 
-        return NextResponse.json({message: 'Debate history', history: debatemessage, debatedata: debate }, { status:200 })
+        return NextResponse.json({message: 'Interview history', history: interviewmessage, interviewData: interview }, { status:200 })
     } catch {
         return NextResponse.json({error: 'Something went wrong'}, { status : 500})
     }

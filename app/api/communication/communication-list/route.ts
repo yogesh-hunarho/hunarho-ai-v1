@@ -6,7 +6,7 @@ const RequestBodySchema = z.object({
     userId: z.string(),
 });
 
-export async function GET(req:NextRequest){
+export async function POST(req:NextRequest){
     let body;
     try {
         body = RequestBodySchema.parse(await req.json());
@@ -14,7 +14,7 @@ export async function GET(req:NextRequest){
         return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
     try {
-        const debate = await prisma.communication.findMany({
+        const communication = await prisma.communication.findMany({
             where: { userId:body.userId },
             select:{
                 prepType:true,
@@ -26,11 +26,11 @@ export async function GET(req:NextRequest){
             
         });
     
-        if (!debate) {
-            return NextResponse.json({ error: 'Debate not found' },{ status:404 });
+        if (!communication) {
+            return NextResponse.json({ error: 'Communication not found' },{ status:404 });
         }
         
-        return NextResponse.json({message: 'Debate list', debatedata:debate }, { status:200 })
+        return NextResponse.json({message: 'Communication list', communicationdata:communication }, { status:200 })
     } catch {
         return NextResponse.json({error: 'Something went wrong'}, { status : 500})
     }

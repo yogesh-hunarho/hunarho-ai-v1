@@ -15,6 +15,11 @@ export async function POST(req:NextRequest){
                 difficultyLevel: true,
                 focusArea: true,
                 userId: true,
+                evaluation:true,
+                evaluationMessage:true,
+                score:true,
+                createdAt:true,
+                id:true,
             }
         });
     
@@ -23,7 +28,7 @@ export async function POST(req:NextRequest){
         }
 
         const communicationmessage = await prisma.communicationMessage.findMany({
-            where: { communicationId: uniqueId, },
+            where: { communicationId: communication.id, },
             select:{
                 sender:true,
                 content:true,

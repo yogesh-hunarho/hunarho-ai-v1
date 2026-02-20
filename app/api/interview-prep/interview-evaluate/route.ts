@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // 1. Fetch interview and messages
     const interview = await prisma.interview.findUnique({
-      where: { id: body.interviewId },
+      where: { uniqueId: body.interviewId },
       include: {
         messages: {
           orderBy: { timestamp: "asc" },

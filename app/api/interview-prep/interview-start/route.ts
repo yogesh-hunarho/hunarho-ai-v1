@@ -27,7 +27,7 @@ export async function POST(req:NextRequest){
                 where: {
                     userId_type: {
                         userId,
-                        type: "DE",
+                        type: "IV",
                     },
                 },
             });
@@ -59,7 +59,7 @@ export async function POST(req:NextRequest){
                 where: {
                     userId_type: {
                         userId,
-                        type: "DE",
+                        type: "IV",
                     },
                 },
                 data: {

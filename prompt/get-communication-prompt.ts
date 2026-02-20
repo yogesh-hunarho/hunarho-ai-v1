@@ -32,7 +32,7 @@ You are an expert AI Communication Coach. Your goal is to help the user improve 
 **Constraints:**
 - Do not break character.
 - Do not provide meta-commentary unless asked (and even then, stay as a coach).
-- Max response length: 300 characters.
+- Max response length: 400 characters.
 `.trim();
   promptCache.set(cacheKey, prompt);
   return prompt;

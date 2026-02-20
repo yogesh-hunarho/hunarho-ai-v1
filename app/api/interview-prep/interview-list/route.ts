@@ -6,7 +6,7 @@ const RequestBodySchema = z.object({
     userId: z.string(),
 });
 
-export async function GET(req:NextRequest){
+export async function POST(req:NextRequest){
     let body;
     try {
         body = RequestBodySchema.parse(await req.json());
@@ -30,7 +30,7 @@ export async function GET(req:NextRequest){
             return NextResponse.json({ error: 'Interview list not found' },{ status:404 });
         }
         
-        return NextResponse.json({message: 'Interview list', debatedata:interview }, { status:200 })
+        return NextResponse.json({message: 'Interview list', interviewData:interview }, { status:200 })
     } catch {
         return NextResponse.json({error: 'Something went wrong'}, { status : 500})
     }
