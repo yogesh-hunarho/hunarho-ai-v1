@@ -1,65 +1,144 @@
-import Image from "next/image";
+"use client"
+
+
+import { useRef, useState } from "react";
+
+
+type Level = "easy" | "medium" | "hard";
+type ArgueType = "support" | "against";
 
 export default function Home() {
+
+  const [topic, setTopic] = useState("");
+  const [level, setLevel] = useState<Level>("easy");
+  const [argueType, setArgueType] = useState<ArgueType>("support");
+  const [message, setMessage] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [responseTime, setResponseTime] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [provider,setProvider] =useState("MURF")
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handleSend = async () => {
+    setError(null);
+    setResponseTime(null);
+
+    if (!topic || !message) {
+      setError("Topic and message are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const startTime = performance.now(); // ⏱ start timer
+
+      const res = await fetch("/api/debate-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          debateId: crypto.randomUUID(),
+          topic,
+          level,
+          argueType,
+          provider,
+          userMessage: message,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch debate voice");
+      }
+
+      const audioBlob = await res.blob();
+
+      const endTime = performance.now(); // ⏱ end timer
+      setResponseTime(endTime - startTime);
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+      }
+    } catch (err: any) {
+      setError(err.message ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex min-h-screen items-center justify-center bg-black font-sans">
+      <div className="max-w-xl mx-auto p-6 space-y-4 border rounded-lg">
+        <h2 className="text-xl font-semibold">AI Debate Voice</h2>
+
+        <input
+          className="w-full border p-2 rounded placeholder:text-gray-500"
+          placeholder="Debate Topic"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+        <select
+          className="w-full border p-2 rounded"
+          value={level}
+          onChange={(e) => setLevel(e.target.value as Level)}
+        >
+          <option value="easy" className="text-black">Easy</option>
+          <option value="medium" className="text-black">Medium</option>
+          <option value="hard" className="text-black">Hard</option>
+        </select>
+
+        <select
+          className="w-full border p-2 rounded text-white"
+          value={argueType}
+          onChange={(e) => setArgueType(e.target.value as ArgueType)}
+        >
+          <option value="support" className="text-black">Support</option>
+          <option value="against" className="text-black">Against</option>
+        </select>
+
+        <textarea
+          className="w-full border p-2 rounded"
+          rows={4}
+          placeholder="Write your debate message..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+
+        <select
+          value={provider}
+          onChange={(e) => setProvider(e.target.value as "MURF" | "INWORLD")}
+          className="border p-2 rounded w-full"
+        >
+          <option value="MURF" className="text-black">Murf</option>
+          <option value="INWORLD" className="text-black">Inworld</option>
+          <option value="SARVAM" className="text-black">Sarvam</option>
+        </select>
+
+        <button
+          onClick={handleSend}
+          disabled={loading}
+          className="w-full bg-blue-500 text-white p-2 rounded disabled:opacity-50"
+        >
+          {loading ? "Generating voice..." : "Send"}
+        </button>
+
+        {responseTime !== null && (
+          <p className="text-sm text-green-600">
+            ⏱ Response Time: {responseTime.toFixed(0)} ms (
+            {(responseTime / 1000).toFixed(2)}s)
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-39.5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/8 px-5 transition-colors hover:border-transparent hover:bg-black/4 dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-39.5"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        )}
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <audio ref={audioRef} controls className="w-full mt-2" />
+      </div>
     </div>
   );
 }

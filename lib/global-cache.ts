@@ -24,6 +24,7 @@ export interface Communication {
     difficultyLevel: string;
     focusArea: string;
     userId: string;
+    id:string;
 }
 
 export async function fetchDebate(debateId: string): Promise<Debate | null> {
@@ -63,7 +64,7 @@ export async function fetchCommunication(communicationId: string): Promise<Commu
 
     const comm = await prisma.communication.findUnique({
         where: { uniqueId: communicationId },
-        select: { prepType: true, difficultyLevel: true, focusArea: true, userId: true },
+        select: { prepType: true, difficultyLevel: true, focusArea: true, userId: true, id:true },
     });
 
     if (!comm) return null;
@@ -79,6 +80,7 @@ export interface Interview {
     yearsOfExperience: number;
     interviewType: string;
     userId: string;
+    id: string;
 }
 
 const interviewCache = new LRUCache<string, Interview>({
@@ -103,7 +105,8 @@ export async function fetchInterview(interviewId: string): Promise<Interview | n
             techStack: true,
             yearsOfExperience: true,
             interviewType: true, 
-            userId: true 
+            userId: true,
+            id: true
         },
     });
 
