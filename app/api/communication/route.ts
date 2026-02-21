@@ -59,10 +59,10 @@ export async function POST(req: NextRequest) {
               : body.userMessage 
           },
         ],
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature: 0.6,
+        max_tokens: 300,
         stream: false,
-        top_p: 1
+        top_p: 0.9
       }),
     });
 

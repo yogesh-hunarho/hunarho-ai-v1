@@ -63,10 +63,10 @@ export async function POST(req: NextRequest) {
               : userMessageContent 
           },
         ],
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature: 0.3,  // 0.7
+        max_tokens: 400,
         stream: false,
-        top_p: 1
+        top_p: 0.85 // 1
       }),
     });
 
